@@ -1,0 +1,30 @@
+[project]
+name = "kobald"
+version = "0.1.0"
+files = [
+    "src/arch/x86_64/init.c",
+
+    "src/term/flanterm/flanterm.c",
+    "src/term/flanterm/backends/fb.c",
+    "src/term/term.c",
+
+    "src/bootloader.c",
+
+    "src/arch/x86_64/gdt.c",
+    "src/arch/x86_64/asm/gdt.asm",
+
+    "src/arch/x86_64/pmm.c",
+
+    "src/libc/abort.c",
+    "src/libc/stdio/printf.c",
+    "src/libc/stdio/putchar.c",
+    "src/libc/stdio/puts.c",
+    "src/libc/string/memcmp.c",
+    "src/libc/string/memcpy.c",
+    "src/libc/string/memmove.c",
+    "src/libc/string/memset.c",
+    "src/libc/string/strlen.c",
+]
+
+[build]
+script = "kobuild.lua"
