@@ -43,6 +43,70 @@ int itoa(int value, char *sp, int radix)
     return len;
 }
 
+int ltoa(long int value, char *sp, int radix)
+{
+    char tmp[32];// be careful with the length of the buffer
+    char *tp = tmp;
+    int i;
+    unsigned v;
+
+    int sign = (radix == 10 && value < 0);    
+    if (sign)
+        v = -value;
+    else
+        v = (unsigned long)value;
+
+    while (v || tp == tmp)
+    {
+        i = v % radix;
+        v /= radix;
+        if (i < 10)
+          *tp++ = i+'0';
+        else
+          *tp++ = i + 'a' - 10;
+    }
+
+    int len = tp - tmp;
+
+    if (sign) 
+    {
+        *sp++ = '-';
+        len++;
+    }
+
+    while (tp > tmp)
+        *sp++ = *--tp;
+
+    return len;
+}
+
+int ultoa(unsigned long int value, char *sp, int radix)
+{
+    char tmp[32];// be careful with the length of the buffer
+    char *tp = tmp;
+    int i;
+    unsigned long v;
+
+	v = value;
+
+    while (v || tp == tmp)
+    {
+        i = v % radix;
+        v /= radix;
+        if (i < 10)
+          *tp++ = i+'0';
+        else
+          *tp++ = i + 'a' - 10;
+    }
+
+    int len = tp - tmp;
+
+    while (tp > tmp)
+        *sp++ = *--tp;
+
+    return len;
+}
+
 
 static bool print(const char* data, size_t length) {
 	const unsigned char* bytes = (const unsigned char*) data;
@@ -105,22 +169,48 @@ int printf(const char* restrict format, ...) {
 			format++;
 			int num = va_arg(parameters, int);
 			char numbuf[20];
-			itoa(num, numbuf, 10);
-			size_t len = strlen(numbuf);
-			if (maxrem < len)
+			int len = itoa(num, numbuf, 10);
+			if (maxrem < (unsigned long)len)
 				return -1;
 			if (!print(numbuf, len))
 				return -1;
 			written += len;
+		} else if (*format == 'l') {
+			format++;
+			if (*format == 'i') {
+				format++;
+				int num = va_arg(parameters, int);
+				char numbuf[32];
+				int len = ltoa(num, numbuf, 10);
+				if (maxrem < (unsigned long)len)
+					return -1;
+				if (!print(numbuf, len))
+					return -1;
+				written += len;
+			}
+			else if (*format == 'u') {
+				format++;
+				int num = va_arg(parameters, int);
+				char numbuf[32];
+				int len = ultoa(num, numbuf, 10);
+				if (maxrem < (unsigned long)len)
+					return -1;
+				if (!print(numbuf, len))
+					return -1;
+				written += len;
+			}
+			else {
+				format++;
+				format++;
+			}
 		} else if (*format == 'p') {
 			format++;
 			uint64_t ptr = (uint64_t) va_arg(parameters, void*);
 			char ptrbuf[40];
 			ptrbuf[0] = '0';
 			ptrbuf[1] = 'x';
-			itoa(ptr, ptrbuf + 2, 16);
-			size_t len = strlen(ptrbuf);
-			if (maxrem < len)
+			int len = ultoa(ptr, ptrbuf + 2, 16);
+			if (maxrem < (unsigned long)len)
 				return -1;
 			if (!print(ptrbuf, len))
 				return -1;

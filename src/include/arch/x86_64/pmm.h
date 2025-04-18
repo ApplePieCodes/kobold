@@ -6,7 +6,7 @@
 
 void initPMM();
 
-void* pmmAalloc(uint64_t size);
+void* pmmAlloc(uint64_t size);
 void* pmmAllocz(uint64_t size);
 void* pmmRealloc(void * ptr, uint64_t old_size, uint64_t new_size);
 void pmmFree(void * ptr, uint64_t size);
