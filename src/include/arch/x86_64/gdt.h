@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <colors.h>
 
 #define GDT_ACCESS_PRESENT 0b10000000 // Segment is present
 #define GDT_ACCESS_RING_0 0b00000000
@@ -24,6 +25,8 @@
 #define GDT_FLAG_LONG_MODE_CODE 0b0010
 #define GDT_FLAG_SIZE_PROTECTED_MODE 0b0100
 #define GDT_FLAG_GRANULARITY 0b1000
+
+#define GDT BGRN "GDT" WHT
 
 /// @brief An entry in the GDT
 typedef struct gdt_entry {

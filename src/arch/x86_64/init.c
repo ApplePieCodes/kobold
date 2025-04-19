@@ -9,12 +9,14 @@
 #include <term/term.h>
 #include <arch/x86_64/gdt.h>
 #include <arch/x86_64/pmm.h>
+#include <arch/x86_64/idt.h>
 #include <stdio.h>
 
 void init() {
     initTerm();
     initGDT();
     initPMM();
+    initIDT();
     while (1) {
 
     }

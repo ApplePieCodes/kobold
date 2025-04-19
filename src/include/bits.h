@@ -1,0 +1,1 @@
+#define BIT(n) (1ULL << (uint64_t)n)

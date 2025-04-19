@@ -12,6 +12,9 @@
 #include "flanterm/flanterm.h"
 #include "flanterm/backends/fb.h"
 #include <stdio.h>
+#include <colors.h>
+#include <term/term.h>
+#include <stddef.h>
 
 struct flanterm_context *context;
 spinlock_t termLock;
@@ -38,7 +41,16 @@ void initTerm() {
     );
 
     spinlockUnlock(&termLock);
-	printf("[TERMINAL] Terminal Initialized\n");
+	printf("[" BGRN "TERMINAL" WHT "] Terminal Initialized\n");
+}
+
+void getScreenSize(size_t *columns, size_t *rows) {
+    return flanterm_get_dimensions(context, columns, rows);
+}
+
+void clearScreen() {
+    printf(BLKB "\033[2J");
+    printf("\033[<0;0H");
 }
 
 int termWriteChar(char c) {

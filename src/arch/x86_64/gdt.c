@@ -7,6 +7,7 @@
 // This file is released under the GNU GPLv3. You can read the license at https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include <arch/x86_64/gdt.h>
+#include <colors.h>
 
 gdt_t gdt;
 
@@ -57,36 +58,36 @@ void loadGDT(gdtr_t gdtr) {
 }
 
 void initGDT() {
-    printf("[GDT] Initializing GDT...\n");
+    printf("[" GDT "] Initializing GDT...\n");
     gdtSetGate(&gdt.null_segment, 0, 0, 0, 0);
-    printf("[GDT] Set Null Segment\n");
+    printf("[" GDT "] Set Null Segment\n");
 
     gdtSetGate(&gdt.kernel_code_segment, 0, 0xFFFFF, 
         GDT_ACCESS_PRESENT | GDT_ACCESS_RING_0 | GDT_ACCESS_EXECUTABLE | 
         GDT_ACCESS_READABLE | GDT_ACCESS_ACCESSED | GDT_ACCESS_DESCRIPTOR_TYPE, 
         GDT_FLAG_LONG_MODE_CODE | GDT_FLAG_GRANULARITY);
-    printf("[GDT] Set Kernel Code Segment\n");
+    printf("[" GDT "] Set Kernel Code Segment\n");
         
     gdtSetGate(&gdt.kernel_data_segment, 0, 0xFFFFF,
         GDT_ACCESS_PRESENT | GDT_ACCESS_RING_0 | GDT_ACCESS_GROW_DOWN | 
         GDT_ACCESS_WRITEABLE | GDT_ACCESS_ACCESSED | GDT_ACCESS_DESCRIPTOR_TYPE,
         GDT_FLAG_SIZE_PROTECTED_MODE | GDT_FLAG_GRANULARITY);
-        printf("[GDT] Set Kernel Data Segment\n");
+        printf("[" GDT "] Set Kernel Data Segment\n");
 
     gdtSetGate(&gdt.user_code_segment, 0, 0xFFFFF,
         GDT_ACCESS_PRESENT | GDT_ACCESS_RING_3 | GDT_ACCESS_EXECUTABLE | 
         GDT_ACCESS_READABLE | GDT_ACCESS_ACCESSED, 
         GDT_FLAG_LONG_MODE_CODE | GDT_FLAG_GRANULARITY);
-        printf("[GDT] Set User Code Segment\n");
+        printf("[" GDT "] Set User Code Segment\n");
 
     gdtSetGate(&gdt.user_data_segment, 0, 0xFFFFF,
         GDT_ACCESS_PRESENT | GDT_ACCESS_RING_0 | GDT_ACCESS_GROW_DOWN | 
         GDT_ACCESS_WRITEABLE | GDT_ACCESS_ACCESSED,
         GDT_FLAG_SIZE_PROTECTED_MODE | GDT_FLAG_GRANULARITY);
-    printf("[GDT] Set User Data Segment\n");
+    printf("[" GDT "] Set User Data Segment\n");
 
     gdtr_t gdtr = setupGdtr();
 
     loadGDT(gdtr);
-    printf("[GDT] GDT Initialized\n");
+    printf("[" GDT "] GDT Initialized\n");
 }

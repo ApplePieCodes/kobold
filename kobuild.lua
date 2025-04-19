@@ -1,6 +1,4 @@
 local function main()
-    c_args = "-I src/include -I src/include/libc -ffreestanding -Wall -Wextra -mcmodel=kernel -g -mgeneral-regs-only -mno-red-zone -mno-sse -mno-sse2 -mno-mmx -fno-omit-frame-pointer -mno-80387 -DPRINTF_ALIAS_STANDARD_FUNCTION_NAMES=HARD -DPRINTF_SUPPORT_EXPONENTIAL_SPECIFIERS=0 -DPRINTF_SUPPORT_DECIMAL_SPECIFIERS=0"
-
     objects = {}
 
     for i, file in ipairs(kobuild_c_files) do
