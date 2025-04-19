@@ -1,0 +1,21 @@
+name: Meson CI
+
+on:
+  push:
+    branches: [ "tail" ]
+  pull_request:
+    branches: [ "tail" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Meson
+      run: pip3 install --user meson
+    - name: Meson Setup
+      run: meson setup build --cross-file x86_64.ini
+    - name: Meson Build
+      run: ninja -C build
