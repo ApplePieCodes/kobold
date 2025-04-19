@@ -22,16 +22,27 @@ This file is released under the GNU GPLv3. You can read the license at https://w
 ### Milestone 1 - Userspace
 
 [X] Terminal Output
+
 [X] GDT
+
 [X] PMM
+
 [ ] VMM
+
 [X] IDT
+
 [ ] ACPI
+
 [ ] APIC
+
 [ ] HPET
+
 [ ] SIMD
+
 [ ] SMP
+
 [ ] MultiTasking
+
 [ ] Userspace
 
 ## Build Instructions
