@@ -13,6 +13,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Pull & update submodules recursively
+      run: |
+          git submodule update --init --recursive
+          git submodule update --recursive --remote
+    - name: Enable Homebrew
+      uses: raviqqe/enable-homebrew@v1.0.0
+    - name: Install Build Tools
+      run: brew install x86_64-elf-gcc ; sudo apt install nasm
     - name: Install Meson
       run: pip3 install --user meson
     - name: Meson Setup
