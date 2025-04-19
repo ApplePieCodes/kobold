@@ -13,10 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Git Submodule Update
+    - name: Pull & update submodules recursively
       run: |
-        git pull --recurse-submodules
-        git submodule update --remote --recursive
+          git submodule update --init --recursive
+          git submodule update --recursive --remote
     - name: Enable Homebrew
       uses: raviqqe/enable-homebrew@v1.0.0
     - name: Install Build Tools
