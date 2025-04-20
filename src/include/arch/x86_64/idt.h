@@ -1,7 +1,18 @@
+// The Kobold Kernel
+
+// src/include/arch/x86_64/idt.h
+
+// Liam Greenway (liamgr33nway@gmail.com, @applepieonrye on Discord)
+// This file is released under the GNU GPLv3. You can read the license at https://www.gnu.org/licenses/gpl-3.0.en.html
+
 #ifndef IDT_H
 #define IDT_H
 
 #include <stdint.h>
+#include <panic.h>
+#include <stdio.h>
+#include <colors.h>
+#include <arch/x86_64/cpu.h>
 
 #define IST_OFFSET_0 0b0000000000000000
 #define IST_OFFSET_1 0b0000000000000001

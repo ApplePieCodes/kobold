@@ -1,13 +1,11 @@
 // The Kobold Kernel
 
 // src/arch/x86_64/gdt.c
-// April 2025
 
 // Liam Greenway (liamgr33nway@gmail.com, @applepieonrye on Discord)
 // This file is released under the GNU GPLv3. You can read the license at https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include <arch/x86_64/gdt.h>
-#include <colors.h>
 
 gdt_t gdt;
 
@@ -39,7 +37,6 @@ gdtr_t setupGdtr() {
 
 /// @brief set the segment registers
 void setSegmentRegisters() {
-    //TODO: Set CS
     asm("mov %0, %%ax" : : "r"((uint16_t)GDT_KERNEL_DATA_SEGMENT));
     asm("mov %ax, %ds");
     asm("mov %ax, %es");
@@ -49,7 +46,7 @@ void setSegmentRegisters() {
 }
 
 
-extern void loadCS();
+extern void loadCS(); // in src/arch/x86_64/asm/gdt.asm
 
 void loadGDT(gdtr_t gdtr) {
     asm("lgdt %0\n" : : "m"(gdtr));

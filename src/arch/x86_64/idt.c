@@ -1,11 +1,19 @@
+// The Kobold Kernel
+
+// src/arch/x86_64/idt.c
+
+// Liam Greenway (liamgr33nway@gmail.com, @applepieonrye on Discord)
+// This file is released under the GNU GPLv3. You can read the license at https://www.gnu.org/licenses/gpl-3.0.en.html
+
 #include <arch/x86_64/idt.h>
-#include <panic.h>
-#include <stdio.h>
-#include <colors.h>
-#include <arch/x86_64/cpu.h>
 
 idt_entry_t idt[256];
 
+/// @brief Sets an IDT Gate
+/// @param gate The gate to set
+/// @param offset The Address of the handler
+/// @param segment The segment to run it in
+/// @param flags The flags to apply
 void setIDTGate(uint16_t gate, uint64_t offset, uint16_t segment, uint16_t flags) {
     idt[gate].flags = flags;
     idt[gate].segment_selector = segment;
@@ -14,6 +22,7 @@ void setIDTGate(uint16_t gate, uint64_t offset, uint16_t segment, uint16_t flags
     idt[gate].offset2 = (offset >> 32) & 0xFFFFFFFF;
 }
 
+/// @brief Creates an IDT Descriptor and loads it
 void loadIDT() {
     idtr_t idtd;
     idtd.size = sizeof(idt_entry_t[256]);

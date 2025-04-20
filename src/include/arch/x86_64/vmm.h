@@ -1,5 +1,18 @@
+// The Kobold Kernel
+
+// src/include/arch/x86_64/vmm.h
+
+// Liam Greenway (liamgr33nway@gmail.com, @applepieonrye on Discord)
+// This file is released under the GNU GPLv3. You can read the license at https://www.gnu.org/licenses/gpl-3.0.en.html
+
 #include <stdint.h>
 #include <bits.h>
+#include <arch/x86_64/pmm.h>
+#include <colors.h>
+#include <math.h>
+#include <stdio.h>
+#include <bootloader.h>
+#include <string.h>
 
 #define PML1_SHIFT 12
 #define PML2_SHIFT 21

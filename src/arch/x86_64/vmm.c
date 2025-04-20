@@ -1,11 +1,11 @@
+// The Kobold Kernel
+
+// src/arch/x86_64/vmm.c
+
+// Liam Greenway (liamgr33nway@gmail.com, @applepieonrye on Discord)
+// This file is released under the GNU GPLv3. You can read the license at https://www.gnu.org/licenses/gpl-3.0.en.html
+
 #include <arch/x86_64/vmm.h>
-#include <arch/x86_64/pmm.h>
-#include <colors.h>
-#include <math.h>
-#include <stdio.h>
-#include <bootloader.h>
-#include <string.h>
-#include <stdint.h>
 
 page_table_t *kernelPagemap;
 
@@ -63,8 +63,6 @@ void initVMM() {
     uint64_t memmap_entries = memmap_request.response->entry_count;
     for (uint64_t i = 0; i < memmap_entries; i++) // Clear usable pages
     {
-        if (memmap[i]->type != LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE)
-            continue;
         for (uint64_t j = 0; j < memmap[i]->length; j += PAGE_SIZE)
         {
             vmmMapPage((uint64_t *)kernelPagemap, memmap[i]->base + j + hhdm_request.response->offset, memmap[i]->base + j, PRESENT_BIT | WRITABLE_BIT);
