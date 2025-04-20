@@ -9,6 +9,7 @@
 #include <term/term.h>
 #include <arch/x86_64/gdt.h>
 #include <arch/x86_64/pmm.h>
+#include <arch/x86_64/vmm.h>
 #include <arch/x86_64/idt.h>
 #include <stdio.h>
 
@@ -17,6 +18,7 @@ void init() {
     initGDT();
     initPMM();
     initIDT();
+    initVMM();
     while (1) {
 
     }

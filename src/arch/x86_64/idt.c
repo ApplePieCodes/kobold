@@ -2,6 +2,7 @@
 #include <panic.h>
 #include <stdio.h>
 #include <colors.h>
+#include <arch/x86_64/cpu.h>
 
 idt_entry_t idt[256];
 
@@ -55,6 +56,12 @@ extern void isr_31();
 
 void initIDT() {
     asm("cli");
+
+    /// Disable PIC1
+    outb(0x0021, 0xff);
+    /// Disable PIC2
+    outb(0x00A1, 0xff);
+
     printf("[" BGRN "IDT" WHT "] Initializing IDT...\n");
     setIDTGate(0, (uint64_t)isr_0, 0x08, INTERUPT_GATE | IDT_RING_3 | IDT_PRESENT);
     setIDTGate(1, (uint64_t)isr_1, 0x08, INTERUPT_GATE | IDT_RING_3 | IDT_PRESENT);

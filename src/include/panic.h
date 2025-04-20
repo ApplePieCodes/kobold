@@ -5,10 +5,6 @@
 #include <string.h>
 
 static inline void panic(const char *reason, registers_t *regs) {
-    printf(REDB "\033[2J");
-    size_t x;
-    size_t y;
-    getScreenSize(&x, &y);
     int len = strlen("PANIC: ");
     len += strlen(reason);
     printf("PANIC: %s\n", reason);

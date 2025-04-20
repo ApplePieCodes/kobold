@@ -45,6 +45,8 @@ This file is released under the GNU GPLv3. You can read the license at https://w
 
 [ ] Userspace
 
+[ ] Make Kernel save info  from limine to reclaim bootloader memory
+
 ## Build Instructions
 
 Run `./makeiso.sh`. It's that easy!
