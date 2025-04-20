@@ -13,12 +13,21 @@
 #include <arch/x86_64/idt.h>
 #include <stdio.h>
 
+extern void stage2Forwarder(uint64_t stack_base);
+
 void init() {
     initTerm();
     initGDT();
     initPMM();
     initIDT();
     initVMM();
+    uint64_t stackPtr = (uint64_t)pmmAlloc(4); // Allocate 4 pages (16 KB)
+    stage2Forwarder(stackPtr);
+}
+
+void initStage2() {
+    printf("Hit Stage 2!");
+
     while (1) {
 
     }

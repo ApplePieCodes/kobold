@@ -4,6 +4,7 @@ project('kobold', 'c', 'nasm',
 
 kernel_sources = files(
     'src/arch/x86_64/init.c',
+    'src/arch/x86_64/asm/stack.asm',
 
     'src/term/flanterm/flanterm.c',
     'src/term/flanterm/backends/fb.c',
