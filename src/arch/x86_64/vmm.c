@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdint.h>
 
-page_table_t kernelPagemap;
+page_table_t *kernelPagemap;
 
 static uint64_t *getOrAllocateTable(uint64_t *parent, uint64_t index, uint8_t flags) {
     if (!(parent[index] & PRESENT_BIT)) {
@@ -30,7 +30,7 @@ void vmmMapPage(uint64_t *pagemap, uint64_t virtualAddress, uint64_t physicalAdd
     uint64_t *pml2 = getOrAllocateTable(pml3, pml3Index, flags);
     uint64_t *pml1 = getOrAllocateTable(pml2, pml2Index, flags);
 
-    pml1[pml1Index] = (physicalAddress & PAGE_MASK) | flags;
+    pml1[pml1Index] = (physicalAddress & PAGE_MASK) | flags;    
 }
 
 void vmmLoadPagemap(uint64_t *map) {
@@ -39,25 +39,26 @@ void vmmLoadPagemap(uint64_t *map) {
 
 void initVMM() {
     printf("[" BGRN "VMM" WHT "] Initializing VMM...\n");
+    kernelPagemap = (page_table_t *)(hhdm_request.response->offset + (uint64_t)pmmAlloc(1));
     memset(kernelPagemap, 0, sizeof(page_table_t));
 
     printf("[" BGRN "VMM" WHT "] Mapping Limine Memory...\n");
     extern uint64_t limineStart, limineEnd; 
     for (uint64_t i = (uint64_t)&limineStart; i < (uint64_t)&limineEnd; i += 4096) {
-        vmmMapPage(kernelPagemap, i, i - hhdm_request.response->offset, PRESENT_BIT);
+        vmmMapPage((uint64_t *)kernelPagemap, i, i - hhdm_request.response->offset, PRESENT_BIT);
     }
     printf("[" BGRN "VMM" WHT "] Limine Memory Mapped\n");
 
     printf("[" BGRN "VMM" WHT "] Mapping Text Memory...\n");
     extern uint64_t textStart, textEnd; 
     for (uint64_t i = (uint64_t)&textStart; i < (uint64_t)&textEnd; i += 4096) {
-        vmmMapPage(kernelPagemap, i, i - hhdm_request.response->offset, PRESENT_BIT);
+        vmmMapPage((uint64_t *)kernelPagemap, i, i - hhdm_request.response->offset, PRESENT_BIT);
     }
     printf("[" BGRN "VMM" WHT "] Text Memory Mappedn");
 
     printf("[" BGRN "VMM" WHT "] Loading Page Map...\n");
 
-    vmmLoadPagemap((uint64_t *)&kernelPagemap);
+    vmmLoadPagemap((uint64_t *)kernelPagemap);
 
     printf("[" BGRN "VMM" WHT "] VMM Initialized`...\n");
 }

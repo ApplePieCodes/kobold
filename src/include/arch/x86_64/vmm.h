@@ -22,11 +22,11 @@
 // RIGHT SHIFT THIS
 #define ADDRESS_OFFSET 12
 #define PAGE_MASK 0x000FFFFFFFFFF000
-#define PAGE_ADDRESS(page) ((page & PAGE_MASK) >> ADDRESS_OFFSET)
+#define PAGE_ADDRESS(page) (page & PAGE_MASK)
 
 typedef uint64_t page_table_t[512];
 
-extern page_table_t kernel_pagemap;
+extern page_table_t *kernelPagemap;
 
 void vmmMapPage(uint64_t *pagemap, uint64_t virtualAddress, uint64_t physicalAddress, uint8_t flags);
 void vmmLoadPagemap(uint64_t *map);
