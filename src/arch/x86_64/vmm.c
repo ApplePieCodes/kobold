@@ -55,7 +55,22 @@ void vmmLoadPagemap(uint64_t *map) {
 
 void initVMM() {
     printf("[" BGRN "VMM" WHT "] Initializing VMM...\n");
+
+    kernelPagemap = (page_table_t *)(hhdm_request.response->offset + (uint64_t)pmmAlloc(1));
+    memset(kernelPagemap, 0, sizeof(page_table_t));
     
+    struct limine_memmap_entry **memmap = memmap_request.response->entries;
+    uint64_t memmap_entries = memmap_request.response->entry_count;
+    for (uint64_t i = 0; i < memmap_entries; i++) // Clear usable pages
+    {
+        if (memmap[i]->type != LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE)
+            continue;
+        for (uint64_t j = 0; j < memmap[i]->length; j += PAGE_SIZE)
+        {
+            vmmMapPage((uint64_t *)kernelPagemap, memmap[i]->base + j + hhdm_request.response->offset, memmap[i]->base + j, PRESENT_BIT);
+        }
+    }
+
     extern char limineStart[], limineEnd[];
 
     uint64_t limineStartAligned = ALIGN_DOWN((uint64_t)&limineStart, PAGE_SIZE);
