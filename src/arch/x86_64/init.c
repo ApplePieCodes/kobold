@@ -19,4 +19,8 @@ void init() {
     initPMM();
     initIDT();
     initVMM();
+
+    while (1) {
+        
+    }
 }
