@@ -48,6 +48,18 @@ void initVMM() {
     for (uint64_t i = ALIGN_DOWN((uint64_t)&limineStart, PAGE_SIZE); i < ALIGN_UP((uint64_t)&limineEnd, PAGE_SIZE); i += PAGE_SIZE) {
         vmmMapPage((uint64_t *)kernelPagemap, i, i - hhdm_request.response->offset, PRESENT_BIT);
     }
+    
+    struct limine_memmap_entry **memmap = memmap_request.response->entries;
+    uint64_t memmap_entries = memmap_request.response->entry_count;
+    for (uint64_t i = 0; i < memmap_entries; i++) // Clear usable pages
+    {
+        if (memmap[i]->type != LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE)
+            continue;
+        for (uint64_t j = 0; j < memmap[i]->length; j += PAGE_SIZE)
+        {
+            vmmMapPage((uint64_t *)kernelPagemap, memmap[i]->base + j, (memmap[i]->base + j) - hhdm_request.response->offset, PRESENT_BIT);
+        }
+    }
     printf("[" BGRN "VMM" WHT "] Limine Memory Mapped\n");
 
     printf("[" BGRN "VMM" WHT "] Mapping Text Memory...\n");
@@ -66,8 +78,8 @@ void initVMM() {
 
     printf("[" BGRN "VMM" WHT "] Mapping Data Memory...\n");
     extern uint64_t dataStart, dataEnd; 
-    for (uint64_t i = (uint64_t)&dataStart; i < (uint64_t)&dataEnd; i += 4096) {
-        vmmMapPage((uint64_t *)kernelPagemap, i, i - hhdm_request.response->offset, PRESENT_BIT | WRITABLE_BIT | WRITETHROUGH_BIT);
+    for (uint64_t i = ALIGN_DOWN((uint64_t)&dataStart, PAGE_SIZE); i < ALIGN_UP((uint64_t)&dataEnd, PAGE_SIZE); i += PAGE_SIZE) {
+        vmmMapPage((uint64_t *)kernelPagemap, i, i - hhdm_request.response->offset, PRESENT_BIT);
     }
     printf("[" BGRN "VMM" WHT "] Data Memory Mapped\n");
 
