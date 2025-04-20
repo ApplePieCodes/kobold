@@ -67,7 +67,7 @@ void initVMM() {
             continue;
         for (uint64_t j = 0; j < memmap[i]->length; j += PAGE_SIZE)
         {
-            vmmMapPage((uint64_t *)kernelPagemap, memmap[i]->base + j + hhdm_request.response->offset, memmap[i]->base + j, PRESENT_BIT);
+            vmmMapPage((uint64_t *)kernelPagemap, memmap[i]->base + j + hhdm_request.response->offset, memmap[i]->base + j, PRESENT_BIT | WRITABLE_BIT);
         }
     }
 
@@ -77,7 +77,7 @@ void initVMM() {
     uint64_t limineEndAligned = ALIGN_UP((uint64_t)&limineEnd, PAGE_SIZE);
 
     for (uint64_t i = limineStartAligned; i < limineEndAligned; i += PAGE_SIZE) {
-        vmmMapPage((uint64_t *)kernelPagemap, i, i - kernel_address_request.response->virtual_base + kernel_address_request.response->physical_base, PRESENT_BIT);
+        vmmMapPage((uint64_t *)kernelPagemap, i, i - kernel_address_request.response->virtual_base + kernel_address_request.response->physical_base, PRESENT_BIT | WRITABLE_BIT);
     }
 
     extern char textStart[], textEnd[];
