@@ -12,7 +12,7 @@ static uint64_t *getOrAllocateTable(uint64_t *parent, uint64_t index, uint8_t fl
     if (!(parent[index] & PRESENT_BIT)) {
         void *page = pmmAlloc(1);
         memset((void *)(hhdm_request.response->offset + (uint64_t)page), 0, 4096);
-        parent[index] = (PAGE_ADDRESS(hhdm_request.response->offset + (uint64_t)page) | flags);
+        parent[index] = (PAGE_ADDRESS((uint64_t)page) | flags);
     }
     else {
         parent[index] |= flags;
@@ -34,7 +34,7 @@ void vmmMapPage(uint64_t *pagemap, uint64_t virtualAddress, uint64_t physicalAdd
 }
 
 void vmmLoadPagemap(uint64_t *map) {
-    asm("movq %0, %%cr3" : : "r"((uint64_t)map) : "rax");
+    asm("movq %0, %%cr3" : : "r"((uint64_t)(map - hhdm_request.response->offset)) : "rax");
 }
 
 void initVMM() {
