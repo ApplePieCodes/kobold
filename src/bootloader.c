@@ -32,5 +32,11 @@ volatile struct limine_hhdm_request hhdm_request = {
     .revision = 0
 };
 
+__attribute__((used, section(".limine_requests")))
+volatile struct limine_kernel_address_request kernel_address_request = {
+    .id = LIMINE_KERNEL_ADDRESS_REQUEST,
+    .revision = 0
+};
+
 __attribute__((used, section(".limine_requests_end")))
 static volatile LIMINE_REQUESTS_END_MARKER;
