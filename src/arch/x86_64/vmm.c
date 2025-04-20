@@ -1,6 +1,7 @@
 #include <arch/x86_64/vmm.h>
 #include <arch/x86_64/pmm.h>
 #include <colors.h>
+#include <math.h>
 #include <stdio.h>
 #include <bootloader.h>
 #include <string.h>
@@ -43,18 +44,32 @@ void initVMM() {
     memset(kernelPagemap, 0, sizeof(page_table_t));
 
     printf("[" BGRN "VMM" WHT "] Mapping Limine Memory...\n");
-    extern uint64_t limineStart, limineEnd; 
-    for (uint64_t i = (uint64_t)&limineStart; i < (uint64_t)&limineEnd; i += 4096) {
+    extern uint64_t limineStart, limineEnd;
+    for (uint64_t i = ALIGN_DOWN((uint64_t)&limineStart, PAGE_SIZE); i < ALIGN_UP((uint64_t)&limineEnd, PAGE_SIZE); i += PAGE_SIZE) {
         vmmMapPage((uint64_t *)kernelPagemap, i, i - hhdm_request.response->offset, PRESENT_BIT);
     }
     printf("[" BGRN "VMM" WHT "] Limine Memory Mapped\n");
 
     printf("[" BGRN "VMM" WHT "] Mapping Text Memory...\n");
     extern uint64_t textStart, textEnd; 
-    for (uint64_t i = (uint64_t)&textStart; i < (uint64_t)&textEnd; i += 4096) {
+    for (uint64_t i = ALIGN_DOWN((uint64_t)&textStart, PAGE_SIZE); i < ALIGN_UP((uint64_t)&textEnd, PAGE_SIZE); i += PAGE_SIZE) {
         vmmMapPage((uint64_t *)kernelPagemap, i, i - hhdm_request.response->offset, PRESENT_BIT);
     }
-    printf("[" BGRN "VMM" WHT "] Text Memory Mappedn");
+    printf("[" BGRN "VMM" WHT "] Text Memory Mapped\n");
+
+    printf("[" BGRN "VMM" WHT "] Mapping Rodata Memory...\n");
+    extern uint64_t rodataStart, rodataEnd; 
+    for (uint64_t i = ALIGN_DOWN((uint64_t)&rodataStart, PAGE_SIZE); i < ALIGN_UP((uint64_t)&rodataEnd, PAGE_SIZE); i += PAGE_SIZE) {
+        vmmMapPage((uint64_t *)kernelPagemap, i, i - hhdm_request.response->offset, PRESENT_BIT);
+    }
+    printf("[" BGRN "VMM" WHT "] Rodata Memory Mapped\n");
+
+    printf("[" BGRN "VMM" WHT "] Mapping Data Memory...\n");
+    extern uint64_t dataStart, dataEnd; 
+    for (uint64_t i = (uint64_t)&dataStart; i < (uint64_t)&dataEnd; i += 4096) {
+        vmmMapPage((uint64_t *)kernelPagemap, i, i - hhdm_request.response->offset, PRESENT_BIT | WRITABLE_BIT | WRITETHROUGH_BIT);
+    }
+    printf("[" BGRN "VMM" WHT "] Data Memory Mapped\n");
 
     printf("[" BGRN "VMM" WHT "] Loading Page Map...\n");
 
