@@ -18,6 +18,7 @@ void init() {
     initPMM();
     initIDT();
     initVMM();
+    printf("GOt memory at %d", (uint64_t)mget(NULL, 20));
 
     while (1) {
         

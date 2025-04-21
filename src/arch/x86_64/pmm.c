@@ -7,7 +7,7 @@
 
 #include <arch/x86_64/pmm.h>
 
-static uint8_t *bitmap;
+uint8_t *bitmap;
 spinlock_t pmmLock;
 uint64_t highest_address;
 uint64_t bitmap_size;

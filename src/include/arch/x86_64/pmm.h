@@ -24,6 +24,9 @@
 
 void initPMM();
 
+extern uint8_t *bitmap;
+extern uint64_t bitmap_size;
+
 void* pmmAlloc(uint64_t size);
 void* pmmAllocz(uint64_t size);
 void* pmmRealloc(void * ptr, uint64_t old_size, uint64_t new_size);

@@ -9,7 +9,6 @@
 #define IDT_H
 
 #include <stdint.h>
-#include <panic.h>
 #include <stdio.h>
 #include <colors.h>
 #include <arch/x86_64/cpu.h>
@@ -69,5 +68,7 @@ typedef struct registers {
 } __attribute__((packed)) registers_t;
 
 void initIDT();
+
+#include <panic.h>
 
 #endif

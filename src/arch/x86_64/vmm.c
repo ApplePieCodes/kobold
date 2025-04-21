@@ -87,6 +87,13 @@ void initVMM() {
         vmmMapPage((uint64_t *)kernelPagemap, i, i - kernel_address_request.response->virtual_base + kernel_address_request.response->physical_base, PRESENT_BIT);
     }
 
+    uint64_t bitmapStartAligned = ALIGN_DOWN((uint64_t)bitmap, PAGE_SIZE);
+    uint64_t bitmapEndAligned = ALIGN_UP((uint64_t)bitmap + bitmap_size, PAGE_SIZE);
+
+    for (uint64_t i = bitmapStartAligned; i < bitmapEndAligned; i += PAGE_SIZE) {
+        vmmMapPage((uint64_t *)kernelPagemap, i, i - kernel_address_request.response->virtual_base + kernel_address_request.response->physical_base, PRESENT_BIT | WRITABLE_BIT);
+    }
+
     extern char dataStart[], dataEnd[];
 
     uint64_t dataStartAligned = ALIGN_DOWN((uint64_t)&dataStart, PAGE_SIZE);
@@ -109,4 +116,89 @@ void initVMM() {
     vmmLoadPagemap((uint64_t *)kernelPagemap);
 
     printf("[" BGRN "VMM" WHT "] VMM Initialized...\n");
+}
+
+bool isPageMapped(uint64_t vaddr) {
+    uint64_t pml4_index = (vaddr >> 39) & 0x1FF;
+    uint64_t pdpt_index = (vaddr >> 30) & 0x1FF;
+    uint64_t pd_index   = (vaddr >> 21) & 0x1FF;
+    uint64_t pt_index   = (vaddr >> 12) & 0x1FF;
+
+    if (!(*kernelPagemap[pml4_index] & PRESENT_BIT)) return false;
+    uint64_t *pdpt = (uint64_t *)(hhdm_request.response->offset + PAGE_ADDRESS(*kernelPagemap[pml4_index]));
+
+    if (!(pdpt[pdpt_index] & PRESENT_BIT)) return false;
+    uint64_t *pd = (uint64_t *)(hhdm_request.response->offset + PAGE_ADDRESS(pdpt[pdpt_index]));
+
+    if (!(pd[pd_index] & PRESENT_BIT)) return false;
+
+    uint64_t *pt = (uint64_t *)(hhdm_request.response->offset + PAGE_ADDRESS(pd[pd_index]));
+
+    return pt[pt_index] & PRESENT_BIT;
+}
+
+
+void *findFreeRegion(size_t size) {
+    uint64_t currentRunStart = 0;
+    uint64_t currentRunLength = 0;
+
+    for (uint64_t i = 0x0; i < 0xFFFFFFFFFFFFF000; i += PAGE_SIZE) {
+        if (isPageMapped(i)) {
+            currentRunLength = 0;
+            currentRunStart = 0;
+        }
+        else {
+            currentRunStart = i;
+            while (isPageMapped(i) == false && i < 0xFFFFFFFFFFFFF000) {
+                currentRunLength += PAGE_SIZE;
+                i += PAGE_SIZE;
+                if (currentRunLength >= size) {
+                    return (void *)currentRunStart;
+                }
+            }
+        }
+    }
+}
+
+/// @brief Get a chunk of memory of the requested size and map it to the requested address, if not null
+/// @param requestedAddress The address to map the memory to, or NULL for any address
+/// @param size The size of the memory to allocate in pages.
+void *mget(uint64_t *requestedAddress, size_t size) {
+    if (requestedAddress == NULL) {
+        void *mem = pmmAlloc(size);
+        if (!mem) {
+            printf("[" BRED "VMM" WHT "] Failed to allocate memory\n");
+            return NULL;
+        }
+        void *freeRegion = findFreeRegion(size * PAGE_SIZE);
+        if (!freeRegion) {
+            printf("[" BRED "VMM" WHT "] Failed to find free region\n");
+            return NULL;
+        }
+        for (size_t i = 0; i < size; i++) {
+            vmmMapPage((uint64_t *)kernelPagemap, (uint64_t)freeRegion + (i * PAGE_SIZE), (uint64_t)mem + (i * PAGE_SIZE), PRESENT_BIT | WRITABLE_BIT);
+        }
+        return freeRegion;
+    }
+    else {
+        uint64_t pml4Index = PAGE_INDEX((uint64_t)requestedAddress, PML4_SHIFT);
+        uint64_t pml3Index = PAGE_INDEX((uint64_t)requestedAddress, PML3_SHIFT);
+        uint64_t pml2Index = PAGE_INDEX((uint64_t)requestedAddress, PML2_SHIFT);
+        uint64_t pml1Index = PAGE_INDEX((uint64_t)requestedAddress, PML1_SHIFT);
+
+        uint64_t *pml3 = getOrAllocateTable((uint64_t *)kernelPagemap, pml4Index, PRESENT_BIT | WRITABLE_BIT);
+        if (!pml3) return NULL;
+        
+        uint64_t *pml2 = getOrAllocateTable(pml3, pml3Index, PRESENT_BIT | WRITABLE_BIT);
+        if (!pml2) return NULL;
+        
+        uint64_t *pml1 = getOrAllocateTable(pml2, pml2Index, PRESENT_BIT | WRITABLE_BIT);
+        if (!pml1) return NULL;
+
+        if (pml1[pml1Index] & PRESENT_BIT) {
+            printf("[" BRED "VMM" WHT "] Memory already allocated at requested address\n");
+            return NULL;
+        }
+        return (void *)requestedAddress;
+    }
 }

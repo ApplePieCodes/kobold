@@ -44,3 +44,4 @@ extern page_table_t *kernelPagemap;
 void vmmMapPage(uint64_t *pagemap, uint64_t virtualAddress, uint64_t physicalAddress, uint8_t flags);
 void vmmLoadPagemap(uint64_t *map);
 void initVMM();
+void *mget(uint64_t *requestedAddress, size_t size);
