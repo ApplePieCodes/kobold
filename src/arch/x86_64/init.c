@@ -18,7 +18,11 @@ void init() {
     initPMM();
     initIDT();
     initVMM();
-    printf("GOt memory at %d", (uint64_t)mget(NULL, 20));
+    printf("Got memory at %d\n", (uint64_t)vmmGetPage(NULL, 1));
+    printf("Got memory at %d\n", (uint64_t)vmmGetPage(NULL, 1));
+    vmmDropPage((uint64_t *)4096, 1);
+    printf("Got memory at %d\n", (uint64_t)vmmGetPage(NULL, 1));
+    
 
     while (1) {
         

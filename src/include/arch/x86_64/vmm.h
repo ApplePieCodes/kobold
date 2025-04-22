@@ -34,7 +34,7 @@
 
 // RIGHT SHIFT THIS
 #define ADDRESS_OFFSET 12
-#define PAGE_MASK 0x000FFFFFFFFFF000
+#define PAGE_MASK (uint64_t)0x000FFFFFFFFFF000
 #define PAGE_ADDRESS(page) (page & PAGE_MASK)
 
 typedef uint64_t page_table_t[512];
@@ -44,4 +44,5 @@ extern page_table_t *kernelPagemap;
 void vmmMapPage(uint64_t *pagemap, uint64_t virtualAddress, uint64_t physicalAddress, uint8_t flags);
 void vmmLoadPagemap(uint64_t *map);
 void initVMM();
-void *mget(uint64_t *requestedAddress, size_t size);
+void *vmmGetPage(uint64_t *requestedAddress, size_t size);
+void vmmDropPage(uint64_t *address, size_t size);

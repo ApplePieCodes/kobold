@@ -43,6 +43,24 @@ void vmmMapPage(uint64_t *pagemap, uint64_t virtualAddress, uint64_t physicalAdd
     pml1[pml1Index] = (physicalAddress & PAGE_MASK) | flags | PRESENT_BIT;    
 }
 
+void vmmUnmapPage(uint64_t *pagemap, uint64_t virtualAddress) {
+    uint64_t pml4Index = PAGE_INDEX(virtualAddress, PML4_SHIFT);
+    uint64_t pml3Index = PAGE_INDEX(virtualAddress, PML3_SHIFT);
+    uint64_t pml2Index = PAGE_INDEX(virtualAddress, PML2_SHIFT);
+    uint64_t pml1Index = PAGE_INDEX(virtualAddress, PML1_SHIFT);
+
+    uint64_t *pml3 = (uint64_t *)(hhdm_request.response->offset + PAGE_ADDRESS(pagemap[pml4Index]));
+    if (!pml3) return;
+    
+    uint64_t *pml2 = (uint64_t *)(hhdm_request.response->offset + PAGE_ADDRESS(pml3[pml3Index]));
+    if (!pml2) return;
+    
+    uint64_t *pml1 = (uint64_t *)(hhdm_request.response->offset + PAGE_ADDRESS(pml2[pml2Index]));
+    if (!pml1) return;
+
+    pml1[pml1Index] = 0;
+}
+
 void vmmLoadPagemap(uint64_t *map) {
     uint64_t phys_addr = (uint64_t)map - hhdm_request.response->offset;
     
@@ -91,7 +109,7 @@ void initVMM() {
     uint64_t bitmapEndAligned = ALIGN_UP((uint64_t)bitmap + bitmap_size, PAGE_SIZE);
 
     for (uint64_t i = bitmapStartAligned; i < bitmapEndAligned; i += PAGE_SIZE) {
-        vmmMapPage((uint64_t *)kernelPagemap, i, i - kernel_address_request.response->virtual_base + kernel_address_request.response->physical_base, PRESENT_BIT | WRITABLE_BIT);
+        vmmMapPage((uint64_t *)kernelPagemap, i, i - hhdm_request.response->offset, PRESENT_BIT | WRITABLE_BIT);
     }
 
     extern char dataStart[], dataEnd[];
@@ -137,12 +155,11 @@ bool isPageMapped(uint64_t vaddr) {
     return pt[pt_index] & PRESENT_BIT;
 }
 
-
 void *findFreeRegion(size_t size) {
     uint64_t currentRunStart = 0;
     uint64_t currentRunLength = 0;
 
-    for (uint64_t i = 0x0; i < 0xFFFFFFFFFFFFF000; i += PAGE_SIZE) {
+    for (uint64_t i = 0x1000; i < 0xFFFFFFFFFFFFF000; i += PAGE_SIZE) {
         if (isPageMapped(i)) {
             currentRunLength = 0;
             currentRunStart = 0;
@@ -163,7 +180,7 @@ void *findFreeRegion(size_t size) {
 /// @brief Get a chunk of memory of the requested size and map it to the requested address, if not null
 /// @param requestedAddress The address to map the memory to, or NULL for any address
 /// @param size The size of the memory to allocate in pages.
-void *mget(uint64_t *requestedAddress, size_t size) {
+void *vmmGetPage(uint64_t *requestedAddress, size_t size) {
     if (requestedAddress == NULL) {
         void *mem = pmmAlloc(size);
         if (!mem) {
@@ -173,6 +190,7 @@ void *mget(uint64_t *requestedAddress, size_t size) {
         void *freeRegion = findFreeRegion(size * PAGE_SIZE);
         if (!freeRegion) {
             printf("[" BRED "VMM" WHT "] Failed to find free region\n");
+            pmmFree(mem, size);
             return NULL;
         }
         for (size_t i = 0; i < size; i++) {
@@ -200,5 +218,25 @@ void *mget(uint64_t *requestedAddress, size_t size) {
             return NULL;
         }
         return (void *)requestedAddress;
+    }
+}
+
+void vmmDropPage(uint64_t *address, size_t size) {
+    uint64_t pml4Index = PAGE_INDEX((uint64_t)address, PML4_SHIFT);
+    uint64_t pml3Index = PAGE_INDEX((uint64_t)address, PML3_SHIFT);
+    uint64_t pml2Index = PAGE_INDEX((uint64_t)address, PML2_SHIFT);
+    uint64_t pml1Index = PAGE_INDEX((uint64_t)address, PML1_SHIFT);
+
+    uint64_t *pml3 = getOrAllocateTable((uint64_t *)kernelPagemap, pml4Index, PRESENT_BIT);
+    
+    uint64_t *pml2 = getOrAllocateTable(pml3, pml3Index, PRESENT_BIT);
+    
+    uint64_t *pml1 = getOrAllocateTable(pml2, pml2Index, PRESENT_BIT);
+
+    
+    for (uint64_t i = 0; i < size; i += 4096) {
+        pmmFree((void *)(PAGE_ADDRESS(pml1[pml1Index])), 1);
+        vmmUnmapPage((uint64_t *)kernelPagemap, (uint64_t)address + i);
+        pml1Index++;
     }
 }
