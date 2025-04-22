@@ -18,6 +18,7 @@ kernel_sources = files(
     'src/arch/x86_64/vmm.c',
     
     'src/arch/x86_64/idt.c',
+    'src/arch/x86_64/pic.c',
     'src/arch/x86_64/asm/isr.asm',
 
 

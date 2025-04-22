@@ -6,6 +6,7 @@
 // This file is released under the GNU GPLv3. You can read the license at https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include <arch/x86_64/idt.h>
+#include <arch/x86_64/pic.h>
 
 idt_entry_t idt[256];
 
@@ -62,6 +63,7 @@ extern void isr_28();
 extern void isr_29();
 extern void isr_30();
 extern void isr_31();
+extern void isr_32();
 
 void initIDT() {
     asm("cli");
@@ -103,9 +105,14 @@ void initIDT() {
     setIDTGate(29, (uint64_t)isr_29, 0x08, INTERUPT_GATE | IDT_RING_3 | IDT_PRESENT);
     setIDTGate(30, (uint64_t)isr_30, 0x08, INTERUPT_GATE | IDT_RING_3 | IDT_PRESENT);
     setIDTGate(31, (uint64_t)isr_31, 0x08, INTERUPT_GATE | IDT_RING_3 | IDT_PRESENT);
+    setIDTGate(32, (uint64_t)isr_32, 0x08, INTERUPT_GATE | IDT_RING_3 | IDT_PRESENT);
+
+    remapPIC(0x20, 0x28); // Remap PIC1 to 32 and PIC2 to 40
 
     loadIDT();
     asm("sti");
+
+    enableIRQ(0);
 
     printf("[" BGRN "IDT" WHT "] IDT Initialized\n");
 }
@@ -206,5 +213,9 @@ void isr_common_handler_c(registers_t *regs) {
     }
     else if (regs->interrupt_number == 31) {
         panic("Reserved", regs);
+    }
+    else if (regs->interrupt_number == 32) {
+        printf("Timer Interrupt\n");
+        sendEOI(0x00);
     }
 }

@@ -92,6 +92,8 @@ isr_stub_err 29
 isr_stub_err 30
 isr_stub 31
 
+isr_stub 32 ; PIT
+
 extern isr_common_handler_c
 
 isr_common_handler:
