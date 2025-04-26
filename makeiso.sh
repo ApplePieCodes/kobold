@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+if [ ! -f "src/term/flanterm/flanterm.c" ]; then
+    git submodule update --init --recursive
+fi
+
 if [ ! -d "build" ]; then
     meson setup build --cross-file x86_64.ini
 fi
