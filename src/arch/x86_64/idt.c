@@ -215,7 +215,7 @@ void isr_common_handler_c(registers_t *regs) {
         panic("Reserved", regs);
     }
     else if (regs->interrupt_number == 32) {
-        printf("Timer Interrupt\n");
+        // TODO: Handle timer interrupt
         sendEOI(0x00);
     }
 }
