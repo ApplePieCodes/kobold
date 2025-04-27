@@ -3,7 +3,7 @@
 #include <arch/x86_64/cpu.h>
 #include <stdio.h>
 
-//TODO: Refactor this Bullshit to use a linked list or something and also for the love of god use a keypress packet
+//TODO: Refactor this めちゃくちゃ to use a linked list or something and also for the love of god use a keypress packet
 
 char keyboardBuffer[256];
 int bufferIndex = 0;
