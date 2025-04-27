@@ -11,6 +11,7 @@
 #include <arch/x86_64/vmm.h>
 #include <arch/x86_64/idt.h>
 #include <stdio.h>
+#include <arch/x86_64/drivers/ps2keyboard.h>
 
 void init() {
     initTerm();
@@ -22,9 +23,11 @@ void init() {
     printf("Got memory at %d\n", (uint64_t)vmmGetPage(NULL, 1));
     vmmDropPage((uint64_t *)4096, 1);
     printf("Got memory at %d\n", (uint64_t)vmmGetPage(NULL, 1));
-    
+        
+    char buffer[256];
 
     while (1) {
-        
+        readLine(buffer);
+        printf("You typed: %s\n", buffer);
     }
 }

@@ -7,6 +7,7 @@
 
 #include <arch/x86_64/idt.h>
 #include <arch/x86_64/pic.h>
+#include <arch/x86_64/drivers/ps2keyboard.h>
 
 idt_entry_t idt[256];
 
@@ -64,6 +65,7 @@ extern void isr_29();
 extern void isr_30();
 extern void isr_31();
 extern void isr_32();
+extern void isr_33();
 
 void initIDT() {
     asm("cli");
@@ -106,6 +108,8 @@ void initIDT() {
     setIDTGate(30, (uint64_t)isr_30, 0x08, INTERUPT_GATE | IDT_RING_3 | IDT_PRESENT);
     setIDTGate(31, (uint64_t)isr_31, 0x08, INTERUPT_GATE | IDT_RING_3 | IDT_PRESENT);
     setIDTGate(32, (uint64_t)isr_32, 0x08, INTERUPT_GATE | IDT_RING_3 | IDT_PRESENT);
+    setIDTGate(33, (uint64_t)isr_33, 0x08, INTERUPT_GATE | IDT_RING_3 | IDT_PRESENT);
+
 
     remapPIC(0x20, 0x28); // Remap PIC1 to 32 and PIC2 to 40
 
@@ -113,6 +117,7 @@ void initIDT() {
     asm("sti");
 
     enableIRQ(0);
+    enableIRQ(1);
 
     printf("[" BGRN "IDT" WHT "] IDT Initialized\n");
 }
@@ -217,5 +222,9 @@ void isr_common_handler_c(registers_t *regs) {
     else if (regs->interrupt_number == 32) {
         // TODO: Handle timer interrupt
         sendEOI(0x00);
+    }
+    else if (regs->interrupt_number == 33) {
+        ps2KeyboardHandler();
+        sendEOI(0x01);
     }
 }

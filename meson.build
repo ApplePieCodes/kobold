@@ -21,6 +21,8 @@ kernel_sources = files(
     'src/arch/x86_64/pic.c',
     'src/arch/x86_64/asm/isr.asm',
 
+    'src/arch/x86_64/drivers/ps2keyboard.c',
+
 
     'src/libc/abort.c',
     'src/libc/stdio/printf.c',

@@ -93,6 +93,7 @@ isr_stub_err 30
 isr_stub 31
 
 isr_stub 32 ; PIT
+isr_stub 33 ; PS/2 Keyboard
 
 extern isr_common_handler_c
 

@@ -5,6 +5,9 @@
 // Liam Greenway (liamgr33nway@gmail.com, @applepieonrye on Discord)
 // This file is released under the GNU GPLv3. You can read the license at https://www.gnu.org/licenses/gpl-3.0.en.html
 
+//TODO: Add support for 5-level paging
+//TODO: Heap Allocator
+
 #include <arch/x86_64/vmm.h>
 
 page_table_t *kernelPagemap;
