@@ -2,9 +2,9 @@
 
 void ps2KeyboardHandler();
 
-void readLine(char *buffer);
-char readKey();
-
 typedef struct keyboardState {
     bool shiftPressed;
+    bool ctrlPressed;
+    bool altPressed;
+    bool superPressed;
 } keyboardState_t;

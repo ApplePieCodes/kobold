@@ -11,7 +11,8 @@
 #include <arch/x86_64/vmm.h>
 #include <arch/x86_64/idt.h>
 #include <stdio.h>
-#include <arch/x86_64/drivers/ps2keyboard.h>
+#include <keyboard.h>
+#include <kshell/kshell.h>
 
 void init() {
     initTerm();
@@ -24,11 +25,5 @@ void init() {
     vmmDropPage((uint64_t *)4096, 1);
     printf("Got memory at %d\n", (uint64_t)vmmGetPage(NULL, 1));
 
-    char buffer[256];
-
-    while (1) {
-        buffer[0] = readKey();
-        buffer[1] = '\0';
-        printf("%s", buffer);
-    }
+    runKShell();
 }

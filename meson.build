@@ -9,7 +9,11 @@ kernel_sources = files(
     'src/term/flanterm/backends/fb.c',
     'src/term/term.c',
 
+    'src/kshell/kshell.c',
+
     'src/bootloader.c',
+
+    'src/keyboard.c',
 
     'src/arch/x86_64/gdt.c',
     'src/arch/x86_64/asm/gdt.asm',
