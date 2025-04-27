@@ -23,11 +23,12 @@ void init() {
     printf("Got memory at %d\n", (uint64_t)vmmGetPage(NULL, 1));
     vmmDropPage((uint64_t *)4096, 1);
     printf("Got memory at %d\n", (uint64_t)vmmGetPage(NULL, 1));
-        
+
     char buffer[256];
 
     while (1) {
-        readLine(buffer);
-        printf("You typed: %s\n", buffer);
+        buffer[0] = readKey();
+        buffer[1] = '\0';
+        printf("%s", buffer);
     }
 }

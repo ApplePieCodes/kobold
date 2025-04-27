@@ -3,6 +3,7 @@
 void ps2KeyboardHandler();
 
 void readLine(char *buffer);
+char readKey();
 
 typedef struct keyboardState {
     bool shiftPressed;
