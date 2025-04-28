@@ -1,3 +1,6 @@
+#ifndef KEYBOARD_H
+#define KEYBOARD_H
+
 #include <stdint.h>
 
 #define KeyboardAlt 0b00000001
@@ -151,3 +154,6 @@ typedef struct keypress {
 
 void keyboardPushKey(key_t k, uint8_t modifiers);
 keypress_t keyboardReadKey();
+void readLine(char *buffer);
+
+#endif

@@ -49,7 +49,7 @@ void getScreenSize(size_t *columns, size_t *rows) {
 
 void clearScreen() {
     printf(BLKB "\033[2J");
-    printf("\033[<0;0H");
+    printf("\x1b[H");
 }
 
 int termWriteChar(char c) {
