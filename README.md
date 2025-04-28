@@ -27,7 +27,7 @@ This file is released under the GNU GPLv3. You can read the license at https://w
 
 [X] PMM
 
-[ ] VMM
+[X] VMM
 
 [X] IDT
 
@@ -45,7 +45,7 @@ This file is released under the GNU GPLv3. You can read the license at https://w
 
 [ ] Userspace
 
-[ ] Make Kernel save info  from limine to reclaim bootloader memory
+[ ] Make Kernel save info from limine to reclaim bootloader memory
 
 ## Build Instructions
 
